@@ -1,6 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Bienvenue sur PinBoard </h1>
-    <p>Ceci est la page d'accueil.</p>
+<div class="container mt-5">
+    <h1>Bienvenue sur PinBoard 🎉</h1>
+
+    {% if app.user %}
+        <p>Bonjour <strong>{{ app.user.firstname }}</strong>, vous êtes connecté </p>
+        <a href="{{ path('app_pin_index') }}" class="btn btn-primary">Voir les Pins</a>
+    {% else %}
+        <p>Vous n’êtes pas connecté.</p>
+        <a href="{{ path('app_login') }}" class="btn btn-outline-primary">Se connecter</a>
+        <a href="{{ path('app_register') }}" class="btn btn-outline-secondary">S’inscrire</a>
+    {% endif %}
+</div>
 {% endblock %}

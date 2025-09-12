@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Pin;
-use App\Form\PinType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +15,9 @@ class PinController extends AbstractController
     #[Route('/', name: 'app_pin_index')]
     public function index(EntityManagerInterface $em): Response
     {
+        // Vérifie que l'utilisateur est connecté
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         $pins = $em->getRepository(Pin::class)->findAll();
 
         return $this->render('pin/index.html.twig', [
@@ -26,33 +28,46 @@ class PinController extends AbstractController
     #[Route('/create', name: 'app_pin_create')]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
-        // Vérifier si l’utilisateur est connecté
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $pin = new Pin();
-        $pin->setCreatedAt(new \DateTimeImmutable());
-        $pin->setUpdatedAt(new \DateTime());
-        $pin->setUser($this->getUser());
 
-        $form = $this->createForm(PinType::class, $pin);
-        $form->handleRequest($request);
+        if ($request->isMethod('POST')) {
+            $pin->setTitle($request->request->get('title'));
+            $pin->setDescription($request->request->get('description'));
+            $pin->setCreatedAt(new \DateTimeImmutable());
+            $pin->setUpdatedAt(new \DateTime());
+            $pin->setUser($this->getUser());
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            // Upload image
+            $imageFile = $request->files->get('imageFile');
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('kernel.project_dir').'/public/uploads/pins',
+                    $newFilename
+                );
+                $pin->setImageName($newFilename);
+            }
+
             $em->persist($pin);
             $em->flush();
 
-            $this->addFlash('success', 'Pin créé avec succès');
+            $this->addFlash('success', 'Pin créé avec succès ✅');
+
             return $this->redirectToRoute('app_pin_index');
         }
 
         return $this->render('pin/create.html.twig', [
-            'form' => $form->createView(),
+            'pin' => $pin,
         ]);
     }
 
     #[Route('/{id}', name: 'app_pin_show')]
     public function show(Pin $pin): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         return $this->render('pin/show.html.twig', [
             'pin' => $pin,
         ]);
@@ -63,42 +78,51 @@ class PinController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        // Sécurité : seul l’auteur peut modifier
         if ($pin->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException("Vous ne pouvez modifier que vos propres pins !");
+            throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(PinType::class, $pin);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($request->isMethod('POST')) {
+            $pin->setTitle($request->request->get('title'));
+            $pin->setDescription($request->request->get('description'));
             $pin->setUpdatedAt(new \DateTime());
+
+            $imageFile = $request->files->get('imageFile');
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('kernel.project_dir').'/public/uploads/pins',
+                    $newFilename
+                );
+                $pin->setImageName($newFilename);
+            }
+
             $em->flush();
 
-            $this->addFlash('success', 'Pin modifié avec succès');
+            $this->addFlash('success', 'Pin modifié avec succès ✏️');
             return $this->redirectToRoute('app_pin_index');
         }
 
         return $this->render('pin/edit.html.twig', [
-            'form' => $form->createView(),
             'pin' => $pin,
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_pin_delete')]
-    public function delete(Pin $pin, EntityManagerInterface $em): Response
+    #[Route('/{id}/delete', name: 'app_pin_delete', methods: ['POST'])]
+    public function delete(Request $request, Pin $pin, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        // Sécurité : seul l’auteur peut supprimer
         if ($pin->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException("Vous ne pouvez supprimer que vos propres pins !");
+            throw $this->createAccessDeniedException();
         }
 
-        $em->remove($pin);
-        $em->flush();
+        if ($this->isCsrfTokenValid('delete'.$pin->getId(), $request->request->get('_token'))) {
+            $em->remove($pin);
+            $em->flush();
+            $this->addFlash('danger', 'Pin supprimé ❌');
+        }
 
-        $this->addFlash('danger', 'Pin supprimé');
         return $this->redirectToRoute('app_pin_index');
     }
 }

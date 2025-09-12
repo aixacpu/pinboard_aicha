@@ -6,10 +6,12 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: "users")] // 👈 nom de la table au pluriel
-class User
+#[ORM\Table(name: "users")]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -42,7 +44,37 @@ class User
         $this->pins = new ArrayCollection();
     }
 
-    // --- Getters & Setters ---
+    // ----------------------
+    // Implémentation UserInterface
+    // ----------------------
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email ?? '';
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Utilisé si on stocke des infos sensibles temporaires
+    }
+
+    // ----------------------
+    // Implémentation PasswordAuthenticatedUserInterface
+    // ----------------------
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    // ----------------------
+    // Getters & Setters
+    // ----------------------
 
     public function getId(): ?int
     {
@@ -80,11 +112,6 @@ class User
     {
         $this->email = $email;
         return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
     }
 
     public function setPassword(string $password): self
@@ -129,7 +156,6 @@ class User
             $this->pins->add($pin);
             $pin->setUser($this);
         }
-
         return $this;
     }
 
@@ -140,7 +166,6 @@ class User
                 $pin->setUser(null);
             }
         }
-
         return $this;
     }
 }

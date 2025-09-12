@@ -22,7 +22,10 @@
                         <a href="{{ path('app_pin_index') }}" class="btn btn-secondary btn-sm">Retour</a>
                         {% if app.user and app.user == pin.user %}
                             <a href="{{ path('app_pin_edit', {id: pin.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
-                            <a href="{{ path('app_pin_delete', {id: pin.id}) }}" class="btn btn-danger btn-sm">Supprimer</a>
+                            <form method="post" action="{{ path('app_pin_delete', {id: pin.id}) }}" onsubmit="return confirm('Supprimer ce Pin ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ pin.id) }}">
+                                <button class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
                         {% endif %}
                     </div>
                 </div>

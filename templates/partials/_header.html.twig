@@ -1,6 +1,29 @@
-<header class="py-3 mb-4" style="background-color: var(--primary-color); color: white;">
-    <div class="container">
-        <h1 class="mb-0">PinBoard</h1>
-        <p class="mb-0">Partagez vos images 📌</p>
+<header>
+    <!-- Barre rouge avec logo et titre -->
+    <div class="py-3 text-white d-flex align-items-center" style="background-color: #c0392b;">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo PinBoard" style="height: 50px; margin-right: 15px;">
+        <div>
+            <h1 class="h3 mb-0">PinBoard</h1>
+            <small>Partagez vos images 📌</small>
+        </div>
     </div>
+
+    <!-- Barre de navigation noire -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark m-0">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_pin_create') }}">Créer un Pin</a></li>
+                    {% if app.user %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_account') }}">Mon Profil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_register') }}">S’inscrire</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Se connecter</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
 </header>
