@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="mb-3">{{ pin.title }}</h1>
+
+        {% if pin.imageName %}
+            <img src="{{ asset('uploads/pins/' ~ pin.imageName) }}" 
+                 alt="{{ pin.title }}" 
+                 class="img-fluid rounded mb-3" 
+                 style="max-width:600px;">
+        {% endif %}
+
+        <p><strong>Description :</strong></p>
+        <p>{{ pin.description ?: "Aucune description." }}</p>
+
+        <p><strong>Auteur :</strong> {{ pin.user.firstname }} {{ pin.user.lastname }}</p>
+        <p><strong>Date de création :</strong> {{ pin.createdAt|date('d/m/Y H:i') }}</p>
+        <p><strong>Dernière modification :</strong> {{ pin.updatedAt|date('d/m/Y H:i') }}</p>
+
+        <div class="mt-4">
+            {% if app.user and app.user == pin.user %}
+                <a href="{{ path('app_pin_edit', {id: pin.id}) }}" class="btn btn-warning">Modifier</a>
+                <a href="{{ path('app_pin_delete', {id: pin.id}) }}" class="btn btn-danger">Supprimer</a>
+            {% endif %}
+            <a href="{{ path('app_pin_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,54 +1,11 @@
-<?php
+{% extends 'base.html.twig' %}
 
-namespace App\Controller;
+{% block body %}
+    <h1>Mon profil</h1>
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+    <p><strong>Nom :</strong> {{ user.firstname }} {{ user.lastname }}</p>
+    <p><strong>Email :</strong> {{ user.email }}</p>
+    <p><strong>Date de création :</strong> {{ user.createdAt|date('d/m/Y H:i') }}</p>
 
-#[Route('/account')]
-class AccountController extends AbstractController
-{
-    #[Route('/', name: 'app_account')]
-    public function show(): Response
-    {
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        return $this->render('account/show.html.twig', [
-            'user' => $user,
-        ]);
-    }
-
-    #[Route('/edit', name: 'app_account_edit')]
-    public function edit(Request $request, EntityManagerInterface $em): Response
-    {
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($request->isMethod('POST')) {
-            $user->setFirstname($request->request->get('firstname'));
-            $user->setLastname($request->request->get('lastname'));
-            $user->setEmail($request->request->get('email'));
-            $user->setUpdatedAt(new \DateTime());
-
-            $em->flush();
-
-            $this->addFlash('success', 'Profil mis à jour ✅');
-            return $this->redirectToRoute('app_account');
-        }
-
-        return $this->render('account/edit.html.twig', [
-            'user' => $user,
-        ]);
-    }
-}
+    <a href="{{ path('app_account_edit') }}" class="btn btn-warning">Modifier mon profil</a>
+{% endblock %}

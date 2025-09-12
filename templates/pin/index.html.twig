@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Liste des Pins</h1>
+
+    <div class="row">
+        {% for pin in pins %}
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    {% if pin.imageName %}
+                        <img src="{{ asset('uploads/pins/' ~ pin.imageName) }}" class="card-img-top" style="width:100%; height:250px; object-fit:cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ pin.title|length > 30 ? pin.title|slice(0,30) ~ '...' : pin.title }}
+                        </h5>
+                        <p class="card-text">
+                            Par {{ pin.user.firstname }} {{ pin.user.lastname }}
+                        </p>
+                        <a href="{{ path('app_pin_show', {id: pin.id}) }}" class="btn btn-primary">Voir</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucun pin trouvé.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

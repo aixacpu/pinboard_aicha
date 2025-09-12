@@ -17,6 +17,7 @@ class PinController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $pins = $em->getRepository(Pin::class)->findAll();
+
         return $this->render('pin/index.html.twig', [
             'pins' => $pins,
         ]);
@@ -25,9 +26,13 @@ class PinController extends AbstractController
     #[Route('/create', name: 'app_pin_create')]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
+        // Vérifier si l’utilisateur est connecté
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         $pin = new Pin();
         $pin->setCreatedAt(new \DateTimeImmutable());
         $pin->setUpdatedAt(new \DateTime());
+        $pin->setUser($this->getUser());
 
         $form = $this->createForm(PinType::class, $pin);
         $form->handleRequest($request);
@@ -35,6 +40,8 @@ class PinController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($pin);
             $em->flush();
+
+            $this->addFlash('success', 'Pin créé avec succès');
             return $this->redirectToRoute('app_pin_index');
         }
 
@@ -54,12 +61,21 @@ class PinController extends AbstractController
     #[Route('/{id}/edit', name: 'app_pin_edit')]
     public function edit(Request $request, Pin $pin, EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        // Sécurité : seul l’auteur peut modifier
+        if ($pin->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Vous ne pouvez modifier que vos propres pins !");
+        }
+
         $form = $this->createForm(PinType::class, $pin);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $pin->setUpdatedAt(new \DateTime());
             $em->flush();
+
+            $this->addFlash('success', 'Pin modifié avec succès');
             return $this->redirectToRoute('app_pin_index');
         }
 
@@ -72,8 +88,17 @@ class PinController extends AbstractController
     #[Route('/{id}/delete', name: 'app_pin_delete')]
     public function delete(Pin $pin, EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        // Sécurité : seul l’auteur peut supprimer
+        if ($pin->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Vous ne pouvez supprimer que vos propres pins !");
+        }
+
         $em->remove($pin);
         $em->flush();
+
+        $this->addFlash('danger', 'Pin supprimé');
         return $this->redirectToRoute('app_pin_index');
     }
 }

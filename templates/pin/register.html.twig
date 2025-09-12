@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Inscription</h1>
+
+    <form method="post">
+        <label>Prénom :</label>
+        <input type="text" name="firstname" class="form-control">
+
+        <label>Nom :</label>
+        <input type="text" name="lastname" class="form-control">
+
+        <label>Email :</label>
+        <input type="email" name="email" class="form-control">
+
+        <label>Mot de passe :</label>
+        <input type="password" name="password" class="form-control">
+
+        <button type="submit" class="btn btn-success mt-3">S'inscrire</button>
+    </form>
+{% endblock %}
