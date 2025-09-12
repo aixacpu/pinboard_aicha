@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Modifier mon profil</h1>
+
+    <form method="post">
+        <label>Prénom :</label>
+        <input type="text" name="firstname" value="{{ user.firstname }}">
+
+        <label>Nom :</label>
+        <input type="text" name="lastname" value="{{ user.lastname }}">
+
+        <label>Email :</label>
+        <input type="email" name="email" value="{{ user.email }}">
+
+        <button type="submit">Enregistrer</button>
+    </form>
+{% endblock %}
