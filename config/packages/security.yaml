@@ -2,6 +2,7 @@ security:
     password_hashers:
         App\Entity\User:
             algorithm: auto
+
     providers:
         app_user_provider:
             entity:
@@ -23,9 +24,16 @@ security:
                 path: app_logout
 
     access_control:
-        - { path: ^/pin/create, roles: ROLE_USER }
-        - { path: ^/pin/\d+/edit, roles: ROLE_USER }
-        - { path: ^/pin/\d+/delete, roles: ROLE_USER }
+        # 🔹 Figurines protégées
+        - { path: ^/figurine/create, roles: ROLE_USER }
+        - { path: ^/figurine/\d+/edit, roles: ROLE_USER }
+        - { path: ^/figurine/\d+/delete, roles: ROLE_USER }
+
+        # 🔹 Compte utilisateur
         - { path: ^/account, roles: ROLE_USER }
-        - { path: ^/pin, roles: PUBLIC_ACCESS }
+
+        # 🔹 Figurines visibles publiquement
+        - { path: ^/figurine, roles: PUBLIC_ACCESS }
+
+        # 🔹 Page d'accueil publique
         - { path: ^/, roles: PUBLIC_ACCESS }

@@ -15,42 +15,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $firstname = null;
-
-    #[ORM\Column(length: 50)]
-    private ?string $lastname = null;
-
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(type: "string", length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "string")]
     private ?string $password = null;
 
-    #[ORM\Column(type: "datetime_immutable")]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(type: "string", length: 50)]
+    private ?string $firstname = null;
 
-    #[ORM\Column(type: "datetime")]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(type: "string", length: 50)]
+    private ?string $lastname = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pin::class, cascade: ['persist', 'remove'])]
-    private Collection $pins;
+    #[ORM\Column(type: "string", length: 255, options: ["default" => "default.jpg"])]
+    private string $profileImage = 'default.jpg';
+
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Figurine::class, orphanRemoval: true)]
+    private Collection $figurines;
 
     public function __construct()
     {
-        $this->pins = new ArrayCollection();
+        $this->figurines = new ArrayCollection();
     }
 
-    // ----------------------
-    // Implémentation UserInterface
-    // ----------------------
+    // --- Obligatoires pour la sécurité Symfony ---
 
     public function getUserIdentifier(): string
     {
-        return $this->email ?? '';
+        return (string) $this->email;
     }
 
     public function getRoles(): array
@@ -60,25 +55,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Utilisé si on stocke des infos sensibles temporaires
+        // Ici tu peux nettoyer des infos sensibles si tu en stockes
     }
 
-    // ----------------------
-    // Implémentation PasswordAuthenticatedUserInterface
-    // ----------------------
+    // --- Getters / setters habituels ---
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
 
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    // ----------------------
-    // Getters & Setters
-    // ----------------------
-
-    public function getId(): ?int
+    public function setPassword(string $password): self
     {
-        return $this->id;
+        $this->password = $password;
+        return $this;
     }
 
     public function getFirstname(): ?string
@@ -103,69 +109,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getProfileImage(): string
     {
-        return $this->email;
+        return $this->profileImage;
     }
 
-    public function setEmail(string $email): self
+    public function setProfileImage(string $profileImage): self
     {
-        $this->email = $email;
-        return $this;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
+        $this->profileImage = $profileImage;
         return $this;
     }
 
     /**
-     * @return Collection<int, Pin>
+     * @return Collection<int, Figurine>
      */
-    public function getPins(): Collection
+    public function getFigurines(): Collection
     {
-        return $this->pins;
-    }
-
-    public function addPin(Pin $pin): self
-    {
-        if (!$this->pins->contains($pin)) {
-            $this->pins->add($pin);
-            $pin->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removePin(Pin $pin): self
-    {
-        if ($this->pins->removeElement($pin)) {
-            if ($pin->getUser() === $this) {
-                $pin->setUser(null);
-            }
-        }
-        return $this;
+        return $this->figurines;
     }
 }

@@ -1,16 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-<div class="container mt-5">
-    <h1>Bienvenue sur PinBoard 🎉</h1>
+{% block title %}Accueil - FigurineVie{% endblock %}
 
-    {% if app.user %}
-        <p>Bonjour <strong>{{ app.user.firstname }}</strong>, vous êtes connecté </p>
-        <a href="{{ path('app_pin_index') }}" class="btn btn-primary">Voir les Pins</a>
-    {% else %}
-        <p>Vous n’êtes pas connecté.</p>
-        <a href="{{ path('app_login') }}" class="btn btn-outline-primary">Se connecter</a>
-        <a href="{{ path('app_register') }}" class="btn btn-outline-secondary">S’inscrire</a>
-    {% endif %}
-</div>
+{% block body %}
+    <div class="text-center mt-5">
+        <h1>Bienvenue sur <span class="text-primary">FigurineVie</span> 🎉</h1>
+
+        {% if app.user %}
+            <p>Bonjour <strong>{{ app.user.firstname }}</strong>, vous êtes connecté.</p>
+            <a href="{{ path('figurine_index') }}" class="btn btn-success btn-lg mt-3">
+                Voir les Figurines
+            </a>
+        {% else %}
+            <p>Connectez-vous ou créez un compte pour partager vos figurines.</p>
+            <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-secondary">Inscription</a>
+        {% endif %}
+    </div>
 {% endblock %}

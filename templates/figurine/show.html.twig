@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail de la figurine{% endblock %}
+
+{% block body %}
+<h1>{{ figurine.title }}</h1>
+
+<p><strong>Prix :</strong> {{ figurine.prix|number_format(2, ',', ' ') }} €</p>
+<p><strong>Description :</strong> {{ figurine.description }}</p>
+<p><strong>Image :</strong> <img src="{{ asset('uploads/figurines/' ~ figurine.imageName) }}" alt="{{ figurine.title }}" width="200"></p>
+<p><strong>Publié le :</strong> {{ figurine.createdAt|date('d/m/Y H:i') }}</p>
+
+<a href="{{ path('app_figurine_edit', {'id': figurine.id}) }}">Modifier</a>
+<a href="{{ path('app_figurine_index') }}">Retour à la liste</a>
+{% endblock %}

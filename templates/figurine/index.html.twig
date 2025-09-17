@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Liste des Figurines</h1>
+<a href="{{ path('figurine_new') }}">Ajouter une figurine</a>
+
+<div class="grid">
+    {% for figurine in figurines %}
+        <div class="card">
+            <h3>{{ figurine.title }}</h3>
+            <p>{{ figurine.price }} €</p>
+            <small>Ajoutée le {{ figurine.createdAt|date('d/m/Y H:i') }}</small>
+            {% if figurine.updatedAt %}
+                <small>(Modifiée le {{ figurine.updatedAt|date('d/m/Y H:i') }})</small>
+            {% endif %}
+            <a href="{{ path('figurine_show', {'id': figurine.id}) }}">Voir plus</a>
+        </div>
+    {% else %}
+        <p>Aucune figurine trouvée.</p>
+    {% endfor %}
+</div>
+{% endblock %}

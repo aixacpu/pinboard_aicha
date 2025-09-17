@@ -31,9 +31,6 @@ class RegistrationController extends AbstractController
             );
             $user->setPassword($hashedPassword);
 
-            $user->setCreatedAt(new \DateTimeImmutable());
-            $user->setUpdatedAt(new \DateTime());
-
             $em->persist($user);
             $em->flush();
 
