@@ -9,19 +9,23 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class Figurine
 {
-    use Timestampable; // ✅ ajoute created_at et updated_at automatiquement
+    // Ajoute automatiquement created_at et updated_at
+    use Timestampable;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    // Titre de la figurine
     #[ORM\Column(length: 255)]
     private ?string $titre = null;
 
+    // Prix de la figurine
     #[ORM\Column(type: 'float')]
     private ?float $prix = null;
 
+    // Nom du fichier image de la figurine (stocké dans /public/uploads)
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 

@@ -1,37 +1,56 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity; 
+//  L’espace de noms, toutes tes entités sont dans App\Entity
 
-use App\Entity\Traits\Timestampable;
+use App\Entity\Traits\Timestampable; 
+//  On importe le trait pour gérer automatiquement created_at et updated_at
+
 use Doctrine\ORM\Mapping as ORM;
+//  On importe les annotations/attributs Doctrine pour définir la table et les colonnes
 
 #[ORM\Entity]
-#[ORM\HasLifecycleCallbacks] // ✅ indispensable pour que PrePersist/PreUpdate du trait fonctionnent
+//  Indique que cette classe est une entité Doctrine (elle correspondra à une table en DB)
+
+#[ORM\HasLifecycleCallbacks] 
+//  Permet d’exécuter automatiquement les méthodes du trait (PrePersist/PreUpdate)
 class User
 {
-    use Timestampable; // ✅ ajoute automatiquement created_at et updated_at
+    use Timestampable; 
+    //  Le trait injecte deux champs (created_at, updated_at) + leur logique automatique
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Id] 
+    // Indique que c’est la clé primaire
+
+    #[ORM\GeneratedValue] 
+    //  Doctrine va générer automatiquement l’ID (auto-increment)
+
+    #[ORM\Column(type: 'integer')] 
+    //  La colonne en DB sera un INT
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)] 
+    //  Colonne VARCHAR(255), obligatoire
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)] 
+    //  Colonne VARCHAR(255), obligatoire
     private ?string $nom = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180, unique: true)] 
+    //  Email, unique = pas de doublons autorisés en DB
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)] 
+    //  Mot de passe hashé (on ne stocke jamais le mot de passe en clair)
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)] 
+    //  Colonne optionnelle, permet de stocker le nom du fichier de l’image de profil
     private ?string $profile_image = null;
 
     // === GETTERS & SETTERS ===
+    // Les méthodes publiques pour accéder (get) ou modifier (set) les propriétés privées
 
     public function getId(): ?int
     {
