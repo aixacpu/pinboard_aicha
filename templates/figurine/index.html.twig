@@ -1,22 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>Liste des Figurines</h1>
-<a href="{{ path('figurine_new') }}">Ajouter une figurine</a>
+    <h1>Liste des Figurines</h1>
 
-<div class="grid">
-    {% for figurine in figurines %}
-        <div class="card">
-            <h3>{{ figurine.title }}</h3>
-            <p>{{ figurine.price }} €</p>
-            <small>Ajoutée le {{ figurine.createdAt|date('d/m/Y H:i') }}</small>
-            {% if figurine.updatedAt %}
-                <small>(Modifiée le {{ figurine.updatedAt|date('d/m/Y H:i') }})</small>
-            {% endif %}
-            <a href="{{ path('figurine_show', {'id': figurine.id}) }}">Voir plus</a>
-        </div>
-    {% else %}
+    <a href="{{ path('figurine_new') }}" class="btn btn-success mb-3">Ajouter une figurine</a>
+
+    {% if figurines is empty %}
         <p>Aucune figurine trouvée.</p>
-    {% endfor %}
-</div>
+    {% else %}
+        <ul class="list-group">
+            {% for figurine in figurines %}
+                <li class="list-group-item">
+                    <strong>{{ figurine.title }}</strong> - {{ figurine.price }} € <br>
+                    {{ figurine.description }} <br>
+
+                    {% if figurine.image %}
+                        <img src="{{ asset('uploads/' ~ figurine.image) }}" alt="" width="150"><br>
+                    {% endif %}
+
+                    <small>
+                        Ajouté par <strong>{{ figurine.user.firstname }} {{ figurine.user.lastname }}</strong>
+                        le {{ figurine.createdAt|date('d/m/Y H:i') }}
+                    </small>
+
+                    {% if app.user and app.user.id == figurine.user.id %}
+                        <div class="mt-2">
+                            <a href="{{ path('figurine_edit', {id: figurine.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+
+                            <form method="post" action="{{ path('figurine_delete', {id: figurine.id}) }}" style="display:inline-block;" onsubmit="return confirm('Supprimer cette figurine ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figurine.id) }}">
+                                <button class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}

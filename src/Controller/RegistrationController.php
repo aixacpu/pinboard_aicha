@@ -20,21 +20,29 @@ class RegistrationController extends AbstractController
     ): Response {
         if ($request->isMethod('POST')) {
             $user = new User();
-            $user->setFirstname($request->request->get('firstname'));
-            $user->setLastname($request->request->get('lastname'));
+
+            // On récupère les champs du formulaire
+            $user->setPrenom($request->request->get('prenom'));
+            $user->setNom($request->request->get('nom'));
             $user->setEmail($request->request->get('email'));
 
-            // ✅ Hash du mot de passe ESTOOOO
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $request->request->get('password')
-            );
+            // Hash du mot de passe
+            $hashedPassword = $passwordHasher->hashPassword($user, $request->request->get('password'));
             $user->setPassword($hashedPassword);
 
+            // Image de profil par défaut si aucune image uploadée
+            if ($request->files->get('profile_image')) {
+                $file = $request->files->get('profile_image');
+                $filename = uniqid() . '.' . $file->guessExtension();
+                $file->move($this->getParameter('profiles_directory'), $filename);
+                $user->setProfileImage($filename);
+            } else {
+                $user->setProfileImage('default.jpg');
+            }
+
+            // ✅ plus besoin de setCreatedAt -> géré automatiquement par le Trait
             $em->persist($user);
             $em->flush();
-
-            $this->addFlash('success', 'Inscription réussie 🎉 Vous pouvez vous connecter.');
 
             return $this->redirectToRoute('app_login');
         }

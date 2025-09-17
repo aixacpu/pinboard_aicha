@@ -2,80 +2,49 @@
 
 namespace App\Entity;
 
-use App\Repository\FigurineRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Traits\Timestampable;
+use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: FigurineRepository::class)]
-#[ORM\Table(name: "figurines")]
+#[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 class Figurine
 {
-    use Timestampable;
+    use Timestampable; // ✅ ajoute created_at et updated_at automatiquement
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 100)]
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 3)]
-    private ?string $title = null;
+    #[ORM\Column(length: 255)]
+    private ?string $titre = null;
 
-    #[ORM\Column(type: "text", nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\Column(type: "string", length: 500)]
-    #[Assert\NotBlank]
-    private ?string $imageName = null;
-
-    #[ORM\Column(type: "float")]
-    #[Assert\NotBlank]
+    #[ORM\Column(type: 'float')]
     private ?float $prix = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "figurines")]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
+    // Relation : chaque figurine appartient à un utilisateur
+    #[ORM\ManyToOne(inversedBy: 'figurines')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    // --- Getters & setters ---
+    // === GETTERS & SETTERS ===
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitre(): ?string
     {
-        return $this->title;
+        return $this->titre;
     }
 
-    public function setTitle(string $title): self
+    public function setTitre(string $titre): self
     {
-        $this->title = $title;
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    public function getImageName(): ?string
-    {
-        return $this->imageName;
-    }
-
-    public function setImageName(string $imageName): self
-    {
-        $this->imageName = $imageName;
+        $this->titre = $titre;
         return $this;
     }
 
@@ -90,12 +59,23 @@ class Figurine
         return $this;
     }
 
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
+        return $this;
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;

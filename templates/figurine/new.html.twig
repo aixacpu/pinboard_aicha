@@ -1,17 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer une Figurine{% endblock %}
-
 {% block body %}
-    <h1>Créer une nouvelle figurine</h1>
+    <h1 class="mb-4">Créer une nouvelle figurine</h1>
 
-    {{ form_start(form) }}
-        {{ form_row(form.title) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.imageName) }}
-        {{ form_row(form.prix) }}
-        <button class="btn btn-primary">Enregistrer</button>
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        <div class="mb-2">
+            {{ form_label(form.title, 'Titre') }}
+            {{ form_widget(form.title, {'attr': {'class': 'form-control form-control-sm'}}) }}
+        </div>
+
+        <div class="mb-2">
+            {{ form_label(form.description, 'Description') }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-sm', 'rows': 2}}) }}
+        </div>
+
+        <div class="mb-2">
+            {{ form_label(form.image, 'Image') }}
+            {{ form_widget(form.image, {'attr': {'class': 'form-control form-control-sm'}}) }}
+        </div>
+
+        <div class="mb-2">
+            {{ form_label(form.price, 'Prix (€)') }}
+            {{ form_widget(form.price, {'attr': {'class': 'form-control form-control-sm'}}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+        <a href="{{ path('figurine_index') }}" class="btn btn-secondary btn-sm">Retour à la liste</a>
     {{ form_end(form) }}
-
-    <a href="{{ path('figurine_index') }}">⬅ Retour à la liste</a>
 {% endblock %}

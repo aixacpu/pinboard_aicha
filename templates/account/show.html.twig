@@ -1,11 +1,20 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Mon profil</h1>
+    <h1>Mon Profil</h1>
 
-    <p><strong>Nom :</strong> {{ user.firstname }} {{ user.lastname }}</p>
-    <p><strong>Email :</strong> {{ user.email }}</p>
-    <p><strong>Date de création :</strong> {{ user.createdAt|date('d/m/Y H:i') }}</p>
+    <div class="card" style="width: 18rem;">
+        {% if user.profileImage %}
+            <img src="{{ asset('uploads/profiles/' ~ user.profileImage) }}" class="card-img-top" alt="Photo de profil">
+        {% else %}
+            <img src="{{ asset('uploads/profiles/default.jpg') }}" class="card-img-top" alt="Photo de profil par défaut">
+        {% endif %}
 
-    <a href="{{ path('app_account_edit') }}" class="btn btn-warning">Modifier mon profil</a>
+        <div class="card-body">
+            <p><strong>Prénom :</strong> {{ user.firstname }}</p>
+            <p><strong>Nom :</strong> {{ user.lastname }}</p>
+            <p><strong>Email :</strong> {{ user.email }}</p>
+            <p><strong>Date de création :</strong> {{ user.createdAt|date('d/m/Y H:i') }}</p>
+        </div>
+    </div>
 {% endblock %}

@@ -3,9 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,32 +20,6 @@ class AccountController extends AbstractController
         }
 
         return $this->render('account/show.html.twig', [
-            'user' => $user,
-        ]);
-    }
-
-    #[Route('/edit', name: 'app_account_edit')]
-    public function edit(Request $request, EntityManagerInterface $em): Response
-    {
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($request->isMethod('POST')) {
-            $user->setFirstname($request->request->get('firstname'));
-            $user->setLastname($request->request->get('lastname'));
-            $user->setEmail($request->request->get('email'));
-            $user->setUpdatedAt(new \DateTime());
-
-            $em->flush();
-
-            $this->addFlash('success', 'Profil mis à jour ✅');
-            return $this->redirectToRoute('app_account');
-        }
-
-        return $this->render('account/edit.html.twig', [
             'user' => $user,
         ]);
     }

@@ -2,67 +2,62 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Traits\Timestampable;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: "users")]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks] // ✅ indispensable pour que PrePersist/PreUpdate du trait fonctionnent
+class User
 {
+    use Timestampable; // ✅ ajoute automatiquement created_at et updated_at
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 180, unique: true)]
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(type: "string", length: 50)]
-    private ?string $firstname = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profile_image = null;
 
-    #[ORM\Column(type: "string", length: 50)]
-    private ?string $lastname = null;
-
-    #[ORM\Column(type: "string", length: 255, options: ["default" => "default.jpg"])]
-    private string $profileImage = 'default.jpg';
-
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Figurine::class, orphanRemoval: true)]
-    private Collection $figurines;
-
-    public function __construct()
-    {
-        $this->figurines = new ArrayCollection();
-    }
-
-    // --- Obligatoires pour la sécurité Symfony ---
-
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
-
-    public function getRoles(): array
-    {
-        return ['ROLE_USER'];
-    }
-
-    public function eraseCredentials(): void
-    {
-        // Ici tu peux nettoyer des infos sensibles si tu en stockes
-    }
-
-    // --- Getters / setters habituels ---
+    // === GETTERS & SETTERS ===
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): self
+    {
+        $this->prenom = $prenom;
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -87,44 +82,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFirstname(): ?string
+    public function getProfileImage(): ?string
     {
-        return $this->firstname;
+        return $this->profile_image;
     }
 
-    public function setFirstname(string $firstname): self
+    public function setProfileImage(?string $profile_image): self
     {
-        $this->firstname = $firstname;
+        $this->profile_image = $profile_image;
         return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): self
-    {
-        $this->lastname = $lastname;
-        return $this;
-    }
-
-    public function getProfileImage(): string
-    {
-        return $this->profileImage;
-    }
-
-    public function setProfileImage(string $profileImage): self
-    {
-        $this->profileImage = $profileImage;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Figurine>
-     */
-    public function getFigurines(): Collection
-    {
-        return $this->figurines;
     }
 }

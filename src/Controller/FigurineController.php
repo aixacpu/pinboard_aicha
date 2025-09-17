@@ -30,50 +30,62 @@ class FigurineController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $figurine->setUser($this->getUser()); // lier au user connecté
+
+            $imageFile = $form->get('image')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('kernel.project_dir').'/public/uploads',
+                    $newFilename
+                );
+                $figurine->setImage($newFilename);
+            }
+
             $em->persist($figurine);
             $em->flush();
 
+            $this->addFlash('success', 'Figurine ajoutée ✅');
             return $this->redirectToRoute('figurine_index');
         }
 
         return $this->render('figurine/new.html.twig', [
-            'figurine' => $figurine,
             'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/{id}', name: 'figurine_show', methods: ['GET'])]
-    public function show(Figurine $figurine): Response
-    {
-        return $this->render('figurine/show.html.twig', [
-            'figurine' => $figurine,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'figurine_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Figurine $figurine, EntityManagerInterface $em): Response
     {
+        if ($figurine->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Tu ne peux pas modifier cette figurine !");
+        }
+
         $form = $this->createForm(FigurineType::class, $figurine);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-
+            $this->addFlash('success', 'Figurine modifiée ✅');
             return $this->redirectToRoute('figurine_index');
         }
 
         return $this->render('figurine/edit.html.twig', [
-            'figurine' => $figurine,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}', name: 'figurine_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'figurine_delete', methods: ['POST'])]
     public function delete(Request $request, Figurine $figurine, EntityManagerInterface $em): Response
     {
+        if ($figurine->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Tu ne peux pas supprimer cette figurine !");
+        }
+
         if ($this->isCsrfTokenValid('delete'.$figurine->getId(), $request->request->get('_token'))) {
             $em->remove($figurine);
             $em->flush();
+            $this->addFlash('success', 'Figurine supprimée ✅');
         }
 
         return $this->redirectToRoute('figurine_index');
